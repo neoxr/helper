@@ -1,13 +1,13 @@
-name: Publish TypeScript Package with Provenance
+name: Publish with Yarn + Provenance
 
 on:
   push:
     tags:
-      - 'v*'  # hanya tag versi
+      - 'v*'
 
 permissions:
   contents: read
-  id-token: write  # ⬅️ wajib untuk provenance
+  id-token: write  # ⬅️ WAJIB untuk provenance
 
 jobs:
   publish:
@@ -21,8 +21,16 @@ jobs:
           node-version: 20
           registry-url: 'https://registry.npmjs.org'
 
-      - run: npm ci
+      - name: Install Yarn
+        run: corepack enable  # gunakan Yarn bawaan Node.js terbaru
 
-      - run: npm publish --access public --provenance
+      - name: Install dependencies with Yarn
+        run: yarn install --frozen-lockfile
+
+      - name: Build project
+        run: yarn build  # pastikan ada script build di package.json
+
+      - name: Publish to npm with provenance
+        run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
