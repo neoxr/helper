@@ -2,6 +2,12 @@
 
 > A collection of upload and shortener functions ready to use.
 
+<p align="center">
+
+[![npm version](https://badgen.net/npm/v/@neoxr/helper)](https://badgen.net/npm/v/express) [![Npm package monthly downloads](https://badgen.net/npm/dm/@neoxr/helper)](https://npmjs.com/package/@neoxr/helper) ![GitHub repo size](https://img.shields.io/github/repo-size/neoxr/helper?style=flat) ![Types](https://badgen.net/npm/types/@neoxr/helper)
+
+</p>
+
 ### 1. Open's API (Neoxr)
 
 ```js

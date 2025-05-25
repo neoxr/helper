@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write  # ⬅️ WAJIB untuk provenance
+  id-token: write
 
 jobs:
   publish:
@@ -22,15 +22,17 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install Yarn
-        run: corepack enable  # gunakan Yarn bawaan Node.js terbaru
+        run: corepack enable
 
       - name: Install dependencies with Yarn
         run: yarn install --frozen-lockfile
 
       - name: Build project
-        run: yarn build  # pastikan ada script build di package.json
+        run: yarn build
 
       - name: Publish to npm with provenance
-        run: npm publish --access public --provenance
+        run: |
+          npm publish --access public --provenance
+          npm deprecate @neoxr/helper@"< ${{ github.ref_name }}" "This version is deprecated, please upgrade to the latest version."
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

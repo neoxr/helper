@@ -33,7 +33,7 @@ exports.upload = (i: Buffer | string, extension?: string): Promise<any> => new P
          ext = parsed?.ext || 'txt'
       }
       let form = new FormData
-      form.append('someFiles', Buffer.from(file), 'file.' + (extension || ext))
+      form.append('file', Buffer.from(file), 'file.' + (extension || ext))
       const json = await retry(async () => {
          const response = await (await axios.post('https://s.neoxr.eu/api/upload', form, {
             headers: {
