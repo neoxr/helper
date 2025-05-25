@@ -31,6 +31,8 @@ jobs:
         run: yarn build  # pastikan ada script build di package.json
 
       - name: Publish to npm with provenance
-        run: npm publish --access public --provenance
+        run: |
+          npm publish --access public --provenance
+          npm deprecate @neoxr/helper@"< ${{ github.ref_name }}" "This version is deprecated, please upgrade to the latest version."
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
