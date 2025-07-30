@@ -1,3 +1,3 @@
-const { catbox } = require('./src/index')
+const { studiointermedia } = require('./src/index')
 
-catbox('https://s.neoxr.eu/get/YhXE.jpg').then(console.log)
+studiointermedia('https://s.neoxr.eu/get/TImh.png').then(console.log)

@@ -343,3 +343,69 @@ exports.catbox = (i: Buffer | string, extension?: string): Promise<any> => new P
       })
    }
 })
+
+exports.studiointermedia = (i: Buffer | string): Promise<any> => new Promise(async (resolve, reject) => {
+   try {
+      if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
+      const parse = await (await axios.get('https://www.studiointermedia.com/upload', {
+         headers: {
+            "User-Agent": "Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36"
+         }
+      }))
+      const token = parse.data?.match(/PF\.obj\.config\.auth_token\s=\s"([^"]*)/)?.[1]
+      const cookie = parse?.headers?.['set-cookie']?.join(';')
+      if (!token || !cookie) throw new Error('Can\'t get credentials')
+      const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
+         responseType: 'arraybuffer'
+      })).data : null
+      let ext = 'jpg'
+      const parsed = await getExtension(file)
+      if (parsed) {
+         ext = parsed?.ext || 'jpg'
+      }
+      let form = new FormData
+      form.append('source', Buffer.from(file), 'image.' + ext)
+      form.append('type', 'file')
+      form.append('action', 'upload')
+      form.append('timestamp', (Date.now() * 1))
+      form.append('auth_token', token)
+      form.append('expiration', '')
+      form.append('nsfw', '1')
+      const json = await retry(async () => {
+         const response = await (await axios.post('https://www.studiointermedia.com/json', form, {
+            headers: {
+               "Accept": "*/*",
+               "User-Agent": "Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36",
+               "Origin": "https://www.studiointermedia.com",
+               "Referer": "https://www.studiointermedia.com/upload",
+               "Referrer-Policy": "strict-origin-when-cross-origin",
+               cookie,
+               ...form.getHeaders()
+            }
+         })).data
+         if (response.status_code != 200) throw new Error('Failed to Upload!')
+         return response
+      }, {
+         retries: 5,
+         factor: 2,
+         minTimeout: 1000,
+         maxTimeout: 5000,
+         onRetry: (e, n) => { }
+      })
+      if (json.status_code != 200) throw new Error('Failed to Upload!')
+      resolve({
+         creator,
+         status: true,
+         original: json,
+         data: {
+            url: json.image.url
+         }
+      })
+   } catch (e) {
+      resolve({
+         creator,
+         status: false,
+         msg: e.message
+      })
+   }
+})

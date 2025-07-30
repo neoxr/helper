@@ -108,3 +108,18 @@ import { catbox } from '@neoxr/helper'
 catbox(input: Buffer | String, ext: String).then(console.log)
 ```
 **Site :** [https://catbox.moe](https://catbox.moe)
+
+### 7. Studio Inter Media
+
+```js
+import { studiointermedia } from '@neoxr/helper'
+
+/**
+ * Uploads a file from a Buffer or a remote image URL.
+ * @param input Buffer (binary file) or string (URL)
+ * @returns Promise<Response>
+ * Information : image only
+ */
+studiointermedia(input: Buffer | String).then(console.log)
+```
+**Site :** [https://www.studiointermedia.com/](https://www.studiointermedia.com/)
