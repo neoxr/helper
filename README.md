@@ -123,3 +123,18 @@ import { studiointermedia } from '@neoxr/helper'
 studiointermedia(input: Buffer | String).then(console.log)
 ```
 **Site :** [https://www.studiointermedia.com/](https://www.studiointermedia.com/)
+
+### 8. ImgHost
+
+```js
+import { imghost } from '@neoxr/helper'
+
+/**
+ * Uploads a file from a Buffer or a remote image URL.
+ * @param input Buffer (binary file) or string (URL)
+ * @returns Promise<Response>
+ * Information : image only
+ */
+imghost(input: Buffer | String).then(console.log)
+```
+**Site :** [https://imghost.online/](https://imghost.online/)

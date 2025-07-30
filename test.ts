@@ -1,3 +1,3 @@
-const { studiointermedia } = require('./src/index')
+const { imghost } = require('./src/index')
 
-studiointermedia('https://s.neoxr.eu/get/TImh.png').then(console.log)
+imghost('https://s.neoxr.eu/get/TImh.png').then(console.log)
