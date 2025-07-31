@@ -1,3 +1,3 @@
-const { imghost } = require('./src/index')
+const { quax } = require('./src/index')
 
-imghost('https://s.neoxr.eu/get/TImh.png').then(console.log)
+quax('https://s.neoxr.eu/get/7qxq.png').then(console.log)

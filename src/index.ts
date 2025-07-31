@@ -483,3 +483,51 @@ exports.imghost = (i: Buffer | string): Promise<any> => new Promise(async (resol
       })
    }
 })
+
+exports.quax = (i: Buffer | string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
+   try {
+      if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
+      const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
+         responseType: 'arraybuffer'
+      })).data : null
+      let ext = 'txt'
+      const parsed = await getExtension(file)
+      if (parsed) {
+         ext = parsed?.ext || 'txt'
+      }
+      let form = new FormData
+      form.append('files[]', Buffer.from(file), util.makeId(10) + '.' + (extension || ext))
+      form.append('expiry', '-1')
+      const json = await retry(async () => {
+         const response = await (await axios.post('https://qu.ax/upload.php', form, {
+            headers: {
+               origin: 'https://qu.ax',
+               referer: 'https://qu.ax/',
+               ...form.getHeaders(),
+               'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36'
+            }
+         })).data
+         if (!response?.success) throw new Error('Failed to Upload!')
+         return response
+      }, {
+         retries: 5,
+         factor: 2,
+         minTimeout: 1000,
+         maxTimeout: 5000,
+         onRetry: (e, n) => { }
+      })
+      if (!json.success) throw new Error('Failed to Upload!')
+      resolve({
+         creator,
+         status: true,
+         data: json?.files?.[0]
+      })
+   } catch (e) {
+      console.log(e)
+      resolve({
+         creator,
+         status: false,
+         msg: e.message
+      })
+   }
+})

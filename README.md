@@ -138,3 +138,19 @@ import { imghost } from '@neoxr/helper'
 imghost(input: Buffer | String).then(console.log)
 ```
 **Site :** [https://imghost.online/](https://imghost.online/)
+
+### 9. Quax
+
+```js
+import { quax } from '@neoxr/helper'
+
+/**
+ * Uploads a file from a Buffer or a remote file URL.
+ * @param input Buffer (binary file) or string (URL)
+ * @param ext String (extension) - optional
+ * @returns Promise<Response>
+ * Information : support all extension
+ */
+quax(input: Buffer | String, ext: String).then(console.log)
+```
+**Site :** [https://qu.ax](https://qu.ax)
