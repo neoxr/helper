@@ -1,6 +1,5 @@
 import axios from 'axios'
 import FormData from 'form-data'
-import { fileTypeFromBuffer as getExtension } from 'file-type'
 import util from './utils'
 import * as cheerio from 'cheerio'
 import retry from 'async-retry'
@@ -24,6 +23,7 @@ exports.short = (url: string): Promise<any> => new Promise(async (resolve, rejec
 
 exports.upload = (i: Buffer | string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
+      const { fileTypeFromBuffer: getExtension } = await import('file-type')
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
          responseType: 'arraybuffer'
@@ -62,6 +62,7 @@ exports.upload = (i: Buffer | string, extension?: string): Promise<any> => new P
 
 exports.tmpfiles = (i: Buffer | string, extension?: string, time: number = 60): Promise<any> => new Promise(async resolve => {
    try {
+      const { fileTypeFromBuffer: getExtension } = await import('file-type')
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
          responseType: 'arraybuffer'
@@ -116,6 +117,7 @@ exports.tmpfiles = (i: Buffer | string, extension?: string, time: number = 60): 
 
 exports.imgbb = (i: Buffer | string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
+      const { fileTypeFromBuffer: getExtension } = await import('file-type')
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const parse = await (await axios.get('https://imgbb.com', {
          headers: {
@@ -180,6 +182,7 @@ exports.imgbb = (i: Buffer | string): Promise<any> => new Promise(async (resolve
 
 exports.imgkub = (i: Buffer | string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
+      const { fileTypeFromBuffer: getExtension } = await import('file-type')
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const parse = await (await axios.get('https://imgkub.com', {
          headers: {
@@ -244,6 +247,7 @@ exports.imgkub = (i: Buffer | string): Promise<any> => new Promise(async (resolv
 
 exports.bashupload = (i: Buffer | string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
+      const { fileTypeFromBuffer: getExtension } = await import('file-type')
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
          responseType: 'arraybuffer'
@@ -296,6 +300,7 @@ exports.bashupload = (i: Buffer | string, extension?: string): Promise<any> => n
 
 exports.catbox = (i: Buffer | string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
+      const { fileTypeFromBuffer: getExtension } = await import('file-type')
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
          responseType: 'arraybuffer'
@@ -347,6 +352,7 @@ exports.catbox = (i: Buffer | string, extension?: string): Promise<any> => new P
 
 exports.studiointermedia = (i: Buffer | string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
+      const { fileTypeFromBuffer: getExtension } = await import('file-type')
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const parse = await (await axios.get('https://www.studiointermedia.com/upload', {
          headers: {
@@ -413,6 +419,7 @@ exports.studiointermedia = (i: Buffer | string): Promise<any> => new Promise(asy
 
 exports.imghost = (i: Buffer | string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
+      const { fileTypeFromBuffer: getExtension } = await import('file-type')
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const parse = await (await axios.get('https://imghost.online/en', {
          headers: {
@@ -486,6 +493,7 @@ exports.imghost = (i: Buffer | string): Promise<any> => new Promise(async (resol
 
 exports.quax = (i: Buffer | string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
+      const { fileTypeFromBuffer: getExtension } = await import('file-type')
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
          responseType: 'arraybuffer'
