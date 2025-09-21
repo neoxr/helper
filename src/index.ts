@@ -1,6 +1,6 @@
 import axios from 'axios'
 import FormData from 'form-data'
-import { fromBuffer as getExtension } from 'file-type'
+import { fileTypeFromBuffer as getExtension } from 'file-type'
 import util from './utils'
 import * as cheerio from 'cheerio'
 import retry from 'async-retry'
