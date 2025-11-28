@@ -1,3 +1,3 @@
-const { quax } = require('./src/index')
+const { upload } = require('./src/index')
 
-quax('https://s.neoxr.eu/get/7qxq.png').then(console.log)
+upload('https://s.neoxr.eu/get/ljvUwm.png').then(console.log)
