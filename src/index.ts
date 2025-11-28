@@ -36,7 +36,7 @@ exports.upload = (i: Buffer | string, extension?: string): Promise<any> => new P
       let form = new FormData
       form.append('file', Buffer.from(file), 'file.' + (extension || ext))
       const json = await retry(async () => {
-         const response = await (await axios.post('https://s.neoxr.eu/api/upload', form, {
+         const response = await (await axios.post('https://https://cdn.wapify.workers.dev/upload', form, {
             headers: {
                ...form.getHeaders()
             }
