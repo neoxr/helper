@@ -60,6 +60,39 @@ exports.upload = (i: Buffer | string, extension?: string): Promise<any> => new P
    }
 })
 
+exports.uploadToServer = (i: Buffer | string, name?: string): Promise<any> => new Promise(async (resolve, reject) => {
+   try {
+      if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
+      const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
+         responseType: 'arraybuffer'
+      })).data : null
+      let form = new FormData
+      form.append('file', Buffer.from(file), name)
+      const json = await retry(async () => {
+         const response = await (await axios.post('https://cdn.wapify.workers.dev/upload', form, {
+            headers: {
+               ...form.getHeaders()
+            }
+         })).data
+         if (!response.status) throw new Error('Failed to Upload!')
+         return response
+      }, {
+         retries: 5,
+         factor: 2,
+         minTimeout: 1000,
+         maxTimeout: 5000,
+         onRetry: (e, n) => { }
+      })
+      resolve(json)
+   } catch (e) {
+      resolve({
+         creator,
+         status: false,
+         msg: e.message
+      })
+   }
+})
+
 exports.tmpfiles = (i: Buffer | string, extension?: string, time: number = 60): Promise<any> => new Promise(async resolve => {
    try {
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
