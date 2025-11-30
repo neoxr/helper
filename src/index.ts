@@ -36,7 +36,7 @@ exports.upload = (i: Buffer | string, extension?: string): Promise<any> => new P
       let form = new FormData
       form.append('file', Buffer.from(file), 'file.' + (extension || ext))
       const json = await retry(async () => {
-         const response = await (await axios.post('https://cdn.wapify.workers.dev/upload', form, {
+         const response = await (await axios.post('https://s.neoxr.eu/api/upload', form, {
             headers: {
                ...form.getHeaders()
             }
@@ -60,7 +60,7 @@ exports.upload = (i: Buffer | string, extension?: string): Promise<any> => new P
    }
 })
 
-exports.uploadToServer = (i: Buffer | string, name?: string): Promise<any> => new Promise(async (resolve, reject) => {
+exports.uploadWithName = (i: Buffer | string, name?: string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -69,7 +69,7 @@ exports.uploadToServer = (i: Buffer | string, name?: string): Promise<any> => ne
       let form = new FormData
       form.append('file', Buffer.from(file), name)
       const json = await retry(async () => {
-         const response = await (await axios.post('https://cdn.wapify.workers.dev/upload', form, {
+         const response = await (await axios.post('https://s.neoxr.eu/api/upload', form, {
             headers: {
                ...form.getHeaders()
             }
