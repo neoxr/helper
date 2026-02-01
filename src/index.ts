@@ -22,7 +22,7 @@ exports.short = (url: string): Promise<any> => new Promise(async (resolve, rejec
    }
 })
 
-exports.upload = (i: Buffer | string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
+exports.upload = (i: Buffer | string, filename?: string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -34,7 +34,7 @@ exports.upload = (i: Buffer | string, extension?: string): Promise<any> => new P
          ext = parsed?.ext || 'txt'
       }
       let form = new FormData
-      form.append('file', Buffer.from(file), 'file.' + (extension || ext))
+      form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
       const json = await retry(async () => {
          const response = await (await axios.post('https://s.neoxr.eu/api/upload', form, {
             headers: {
@@ -47,7 +47,7 @@ exports.upload = (i: Buffer | string, extension?: string): Promise<any> => new P
          retries: 5,
          factor: 2,
          minTimeout: 1000,
-         maxTimeout: 5000,
+         maxTimeout: 1500,
          onRetry: (e, n) => { }
       })
       resolve(json)
@@ -80,7 +80,7 @@ exports.uploadWithName = (i: Buffer | string, name?: string): Promise<any> => ne
          retries: 5,
          factor: 2,
          minTimeout: 1000,
-         maxTimeout: 5000,
+         maxTimeout: 1500,
          onRetry: (e, n) => { }
       })
       resolve(json)
@@ -93,7 +93,7 @@ exports.uploadWithName = (i: Buffer | string, name?: string): Promise<any> => ne
    }
 })
 
-exports.tmpfiles = (i: Buffer | string, extension?: string, time: number = 60): Promise<any> => new Promise(async resolve => {
+exports.tmpfiles = (i: Buffer | string, filename?: string, extension?: string, time: number = 60): Promise<any> => new Promise(async resolve => {
    try {
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -110,7 +110,7 @@ exports.tmpfiles = (i: Buffer | string, extension?: string, time: number = 60): 
       }
       let form = new FormData
       form.append('_token', token)
-      form.append('file', Buffer.from(file), util.makeId(10) + '.' + (extension || ext))
+      form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
       form.append('max_views', 0)
       form.append('max_time', time)
       form.append('upload', 'Upload')
@@ -275,7 +275,7 @@ exports.imgkub = (i: Buffer | string): Promise<any> => new Promise(async (resolv
    }
 })
 
-exports.bashupload = (i: Buffer | string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
+exports.uguu = (i: Buffer | string, filename?: string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -287,38 +287,33 @@ exports.bashupload = (i: Buffer | string, extension?: string): Promise<any> => n
          ext = parsed?.ext || 'txt'
       }
       let form = new FormData
-      form.append('json', 'true')
-      form.append('file_1', Buffer.from(file), util.makeId(10) + '.' + (extension || ext))
+      form.append('files[]', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
       const json = await retry(async () => {
-         const response = await (await axios.post('https://bashupload.com', form, {
+         const response = await (await axios.post('https://uguu.se/upload.php', form, {
             headers: {
-               accept: 'application/json',
-               origin: 'https://bashupload.com',
-               referer: 'https://bashupload.com/',
+               origin: 'https://uguu.se',
+               referer: 'https://uguu.se/',
                ...form.getHeaders(),
                'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36'
             }
          })).data
-         if (!response?.file_1?.url) throw new Error('Failed to Upload!')
+         if (!response?.success) throw new Error('Failed to Upload!')
          return response
       }, {
          retries: 5,
          factor: 2,
          minTimeout: 1000,
-         maxTimeout: 5000,
+         maxTimeout: 1500,
          onRetry: (e, n) => { }
       })
-      if (!json?.file_1?.url) throw new Error('Failed to Upload!')
+      if (!json?.success) throw new Error('Failed to Upload!')
       resolve({
          creator,
          status: true,
-         data: {
-            url: json.file_1.url + '?download=1',
-            size: json.file_1.size
-         }
+         data: json.files[0]
       })
    } catch (e) {
-      console.log(e)
+      console.error(e)
       resolve({
          creator,
          status: false,
@@ -327,7 +322,7 @@ exports.bashupload = (i: Buffer | string, extension?: string): Promise<any> => n
    }
 })
 
-exports.catbox = (i: Buffer | string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
+exports.catbox = (i: Buffer | string, filename?: string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -341,7 +336,7 @@ exports.catbox = (i: Buffer | string, extension?: string): Promise<any> => new P
       let form = new FormData
       form.append('reqtype', 'fileupload')
       form.append('userhash', '')
-      form.append('fileToUpload', Buffer.from(file), util.makeId(10) + '.' + (extension || ext))
+      form.append('fileToUpload', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
       const json = await retry(async () => {
          const response = await (await axios.post('https://catbox.moe/user/api.php', form, {
             headers: {
@@ -357,7 +352,7 @@ exports.catbox = (i: Buffer | string, extension?: string): Promise<any> => new P
          retries: 5,
          factor: 2,
          minTimeout: 1000,
-         maxTimeout: 5000,
+         maxTimeout: 1500,
          onRetry: (e, n) => { }
       })
       if (!json || (json && !/files/.test(json))) throw new Error('Failed to Upload!')
@@ -369,7 +364,7 @@ exports.catbox = (i: Buffer | string, extension?: string): Promise<any> => new P
          }
       })
    } catch (e) {
-      console.log(e)
+      console.error(e)
       resolve({
          creator,
          status: false,
@@ -423,7 +418,7 @@ exports.studiointermedia = (i: Buffer | string): Promise<any> => new Promise(asy
          retries: 5,
          factor: 2,
          minTimeout: 1000,
-         maxTimeout: 5000,
+         maxTimeout: 1500,
          onRetry: (e, n) => { }
       })
       if (json.status_code != 200) throw new Error('Failed to Upload!')
@@ -495,7 +490,7 @@ exports.imghost = (i: Buffer | string): Promise<any> => new Promise(async (resol
          retries: 5,
          factor: 2,
          minTimeout: 1000,
-         maxTimeout: 5000,
+         maxTimeout: 1500,
          onRetry: (e, n) => { }
       })
 
@@ -517,7 +512,7 @@ exports.imghost = (i: Buffer | string): Promise<any> => new Promise(async (resol
    }
 })
 
-exports.quax = (i: Buffer | string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
+exports.quax = (i: Buffer | string, filename?: string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
    try {
       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
       const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -529,26 +524,16 @@ exports.quax = (i: Buffer | string, extension?: string): Promise<any> => new Pro
          ext = parsed?.ext || 'txt'
       }
       let form = new FormData
-      form.append('files[]', Buffer.from(file), util.makeId(10) + '.' + (extension || ext))
+      form.append('files[]', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
       form.append('expiry', '-1')
-      const json = await retry(async () => {
-         const response = await (await axios.post('https://qu.ax/upload.php', form, {
-            headers: {
-               origin: 'https://qu.ax',
-               referer: 'https://qu.ax/',
-               ...form.getHeaders(),
-               'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36'
-            }
-         })).data
-         if (!response?.success) throw new Error('Failed to Upload!')
-         return response
-      }, {
-         retries: 5,
-         factor: 2,
-         minTimeout: 1000,
-         maxTimeout: 5000,
-         onRetry: (e, n) => { }
-      })
+      const json = await (await axios.post('https://qu.ax/upload', form, {
+         headers: {
+            origin: 'https://qu.ax',
+            referer: 'https://qu.ax/',
+            ...form.getHeaders(),
+            'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36'
+         }
+      })).data
       if (!json.success) throw new Error('Failed to Upload!')
       resolve({
          creator,
@@ -556,7 +541,110 @@ exports.quax = (i: Buffer | string, extension?: string): Promise<any> => new Pro
          data: json?.files?.[0]
       })
    } catch (e) {
-      console.log(e)
+      console.error(e)
+      resolve({
+         creator,
+         status: false,
+         msg: e?.response?.data?.message || e.message
+      })
+   }
+})
+
+exports.crypty = (i: Buffer | string, filename?: string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
+   try {
+      if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
+      const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
+         responseType: 'arraybuffer'
+      })).data : null
+      let ext = 'txt'
+      const parsed = await getExtension(file)
+      if (parsed) {
+         ext = parsed?.ext || 'txt'
+      }
+      let form = new FormData
+      form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
+
+      const json = await (await axios.post('https://cdn.crypty.workers.dev', form, {
+         headers: form.getHeaders()
+      })).data
+
+      if (!json.status) throw new Error('Failed to Upload!')
+      resolve(json)
+   } catch (e) {
+      console.error(e)
+      resolve({
+         creator,
+         status: false,
+         msg: e.message
+      })
+   }
+})
+
+exports.tempimage = (i: Buffer | string): Promise<any> => new Promise(async (resolve, reject) => {
+   try {
+      if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
+      const parse = await (await axios.get('https://www.temp-image.com', {
+         headers: {
+            "User-Agent": "Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36"
+         }
+      }))
+      const token = cheerio.load(parse.data)('meta[name="csrf-token"]')?.attr('content')
+      const cookie = parse?.headers?.['set-cookie']?.join(';')
+      if (!token || !cookie) throw new Error('Can\'t get credentials')
+      const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
+         responseType: 'arraybuffer'
+      })).data : null
+      let ext = 'jpg'
+      const parsed = await getExtension(file)
+      if (parsed) {
+         ext = parsed?.ext || 'jpg'
+      }
+      let form = new FormData
+      form.append('dzuuid', uuidv4())
+      form.append('dzchunkindex', '0')
+      form.append('dztotalfilesize', file.length)
+      form.append('dzchunksize', file.length)
+      form.append('dztotalchunkcount', '1')
+      form.append('dzchunkbyteoffset', '0')
+      form.append('size', file.length)
+      form.append('type', parsed?.mime)
+      form.append('password', '')
+      form.append('upload_auto_delete', '0')
+      form.append('file', Buffer.from(file), 'image.' + ext)
+      const json = await retry(async () => {
+         const response = await (await axios.post('https://www.temp-image.com/upload', form, {
+            headers: {
+               "Accept": "*/*",
+               "User-Agent": "Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36",
+               "Origin": "https://www.temp-image.com",
+               "Referer": "https://www.temp-image.com/",
+               "Referrer-Policy": "strict-origin-when-cross-origin",
+               cookie,
+               "X-CSRF-TOKEN": token,
+               "X-Requested-With": "XMLHttpRequest",
+               ...form.getHeaders()
+            }
+         })).data
+         if (!response.direct_link) throw new Error('Failed to Upload!')
+         return response
+      }, {
+         retries: 5,
+         factor: 2,
+         minTimeout: 1000,
+         maxTimeout: 1500,
+         onRetry: (e, n) => { }
+      })
+
+      if (!json.direct_link) throw new Error('Failed to Upload!')
+      resolve({
+         creator,
+         status: true,
+         original: json,
+         data: {
+            url: json.direct_link
+         }
+      })
+   } catch (e) {
       resolve({
          creator,
          status: false,

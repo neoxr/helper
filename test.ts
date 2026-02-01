@@ -1,3 +1,3 @@
-const { upload } = require('./src/index')
+const { tempimage } = require('./src/index')
 
-upload('https://s.neoxr.eu/get/ljvUwm.png').then(console.log)
+tempimage('https://s.neoxr.eu/get/ork0Sg.jpg', 'nigga').then(console.log)

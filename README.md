@@ -16,11 +16,12 @@ import { short, upload } from '@neoxr/helper'
 /**
  * Uploads a file from a Buffer or a remote file URL.
  * @param input Buffer (binary file) or string (URL)
- * @param ext String (extension) - optional
+ * @param filename String (filename) - optional
+ * @param extension String (extension) - optional
  * @returns Promise<Response>
  * Information : support all extension
  */
-upload(input: Buffer | String, ext: String).then(console.log)
+upload(input: Buffer | String, filename?: String, extension?: string).then(console.log)
 
 /**
  * Shortens a given URL.
@@ -39,11 +40,12 @@ import { tmpfiles } from '@neoxr/helper'
 /**
  * Uploads a file from a Buffer or a remote file URL.
  * @param input Buffer (binary file) or string (URL)
- * @param ext String (extension) - optional
+ * @param filename String (filename) - optional
+ * @param extension String (extension) - optional
  * @returns Promise<Response>
  * Information : support all extension exclude (.js)
  */
-tmpfiles(input: Buffer | String, ext: String).then(console.log)
+tmpfiles(input: Buffer | String, filename?: String, extension?: String).then(console.log)
 ```
 **Site :** [https://tmpfiles.org](https://tmpfiles.org)
 
@@ -77,21 +79,22 @@ imgkub(input: Buffer | String).then(console.log)
 ```
 **Site :** [https://imgkub.com](https://imgkub.com)
 
-### 5. Bash Upload
+### 5. Uguu
 
 ```js
-import { bashupload } from '@neoxr/helper'
+import { uguu } from '@neoxr/helper'
 
 /**
  * Uploads a file from a Buffer or a remote file URL.
  * @param input Buffer (binary file) or string (URL)
- * @param ext String (extension) - optional
+ * @param filename String (filename) - optional
+ * @param extension String (extension) - optional
  * @returns Promise<Response>
  * Information : support all extension
  */
-bashupload(input: Buffer | String, ext: String).then(console.log)
+uguu(input: Buffer | String, filename?: String, extension?: String).then(console.log)
 ```
-**Site :** [https://bashupload.com](https://bashupload.com)
+**Site :** [https://uguu.se](https://uguu.se)
 
 ### 6. Catbox
 
@@ -101,11 +104,12 @@ import { catbox } from '@neoxr/helper'
 /**
  * Uploads a file from a Buffer or a remote file URL.
  * @param input Buffer (binary file) or string (URL)
- * @param ext String (extension) - optional
+ * @param filename String (filename) - optional
+ * @param extension String (extension) - optional
  * @returns Promise<Response>
  * Information : support all extension
  */
-catbox(input: Buffer | String, ext: String).then(console.log)
+catbox(input: Buffer | String, filename?: String, extension?: String).then(console.log)
 ```
 **Site :** [https://catbox.moe](https://catbox.moe)
 
@@ -147,10 +151,43 @@ import { quax } from '@neoxr/helper'
 /**
  * Uploads a file from a Buffer or a remote file URL.
  * @param input Buffer (binary file) or string (URL)
- * @param ext String (extension) - optional
+ * @param filename String (filename) - optional
+ * @param extension String (extension) - optional
+ * @returns Promise<Response>
+ * Information : support all extension exclude (.ogg)
+ */
+quax(input: Buffer | String, filename?: String, extension?: String).then(console.log)
+```
+**Site :** [https://qu.ax](https://qu.ax)
+
+### 10. Crypty CDN
+
+```js
+import { crypty } from '@neoxr/helper'
+
+/**
+ * Uploads a file from a Buffer or a remote file URL.
+ * @param input Buffer (binary file) or string (URL)
+ * @param filename String (filename) - optional
+ * @param extension String (extension) - optional
  * @returns Promise<Response>
  * Information : support all extension
  */
-quax(input: Buffer | String, ext: String).then(console.log)
+crypty(input: Buffer | String, filename?: String, extension?: String).then(console.log)
 ```
-**Site :** [https://qu.ax](https://qu.ax)
+**Site :** [https://cdn.crypty.workers.dev](https://cdn.crypty.workers.dev)
+
+### 11. Temp Image
+
+```js
+import { tempimage } from '@neoxr/helper'
+
+/**
+ * Uploads a file from a Buffer or a remote image URL.
+ * @param input Buffer (binary file) or string (URL)
+ * @returns Promise<Response>
+ * Information : image only
+ */
+tempimage(input: Buffer | String).then(console.log)
+```
+**Site :** [https://www.temp-image.com/](https://www.temp-image.com/)
