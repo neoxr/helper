@@ -14,6 +14,17 @@ exports.short = (url: string): Promise<any> => new Promise(async (resolve, rejec
       const json = await (await axios.post('https://s.neoxr.eu/api/short', form)).data
       resolve(json)
    } catch (e) {
+      resolve(await exports.fallbackShort(url))
+   }
+})
+
+exports.fallbackShort = (url: string): Promise<any> => new Promise(async (resolve, reject) => {
+   try {
+      let form = new URLSearchParams
+      form.append('url', url)
+      const json = await (await axios.post('https://neoxr-uploader.hf.space/api/short', form)).data
+      resolve(json)
+   } catch (e) {
       resolve({
          creator,
          status: false,
@@ -37,6 +48,7 @@ exports.upload = (i: Buffer | string, filename?: string, extension?: string): Pr
       form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
       const json = await retry(async () => {
          const response = await (await axios.post('https://s.neoxr.eu/api/upload', form, {
+            timeout: 10000,
             headers: {
                ...form.getHeaders()
             }
@@ -44,7 +56,7 @@ exports.upload = (i: Buffer | string, filename?: string, extension?: string): Pr
          if (!response.status) throw new Error('Failed to Upload!')
          return response
       }, {
-         retries: 5,
+         retries: 3,
          factor: 2,
          minTimeout: 1000,
          maxTimeout: 1500,
@@ -52,11 +64,43 @@ exports.upload = (i: Buffer | string, filename?: string, extension?: string): Pr
       })
       resolve(json)
    } catch (e) {
-      resolve({
-         creator,
-         status: false,
-         msg: e.message
+      console.error(`Upload primary failed (${e.message})`)
+      resolve(await exports.fallbackUpload(i, filename, extension))
+   }
+})
+
+exports.fallbackUpload = (i: Buffer | string, filename?: string, extension?: string): Promise<any> => new Promise(async (resolve, reject) => {
+   try {
+      if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
+      const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
+         responseType: 'arraybuffer'
+      })).data : null
+      let ext = 'txt'
+      const parsed = await getExtension(file)
+      if (parsed) {
+         ext = parsed?.ext || 'txt'
+      }
+      let form = new FormData
+      form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
+      const json = await retry(async () => {
+         const response = await (await axios.post('https://neoxr-uploader.hf.space/api/upload', form, {
+            timeout: 10000,
+            headers: {
+               ...form.getHeaders()
+            }
+         })).data
+         if (!response.status) throw new Error('Failed to Upload!')
+         return response
+      }, {
+         retries: 2,
+         factor: 2,
+         minTimeout: 1000,
+         maxTimeout: 1500,
+         onRetry: (e, n) => { }
       })
+      resolve(json)
+   } catch (e) {
+      resolve(await exports.tmpfiles(i, filename, extension))
    }
 })
 
@@ -70,6 +114,7 @@ exports.uploadWithName = (i: Buffer | string, name?: string): Promise<any> => ne
       form.append('file', Buffer.from(file), name)
       const json = await retry(async () => {
          const response = await (await axios.post('https://s.neoxr.eu/api/upload', form, {
+            timeout: 10000,
             headers: {
                ...form.getHeaders()
             }
@@ -77,7 +122,7 @@ exports.uploadWithName = (i: Buffer | string, name?: string): Promise<any> => ne
          if (!response.status) throw new Error('Failed to Upload!')
          return response
       }, {
-         retries: 5,
+         retries: 3,
          factor: 2,
          minTimeout: 1000,
          maxTimeout: 1500,
@@ -85,11 +130,12 @@ exports.uploadWithName = (i: Buffer | string, name?: string): Promise<any> => ne
       })
       resolve(json)
    } catch (e) {
-      resolve({
-         creator,
-         status: false,
-         msg: e.message
-      })
+      console.log(`UploadWithName primary failed, falling back to tmpfiles...`)
+      // Memecah nama dan ekstensi untuk tmpfiles
+      const nameParts = name?.split('.') || []
+      const ext = nameParts.pop()
+      const fileNameOnly = nameParts.join('.')
+      resolve(await exports.tmpfiles(i, fileNameOnly, ext))
    }
 })
 
