@@ -7,15 +7,15 @@ import retry from 'async-retry'
 import { v4 as uuidv4 } from 'uuid'
 
 class Uploader {
-   creator = `@neoxr.js – Wildan Izzudin`
-   timeout = 15000
+   #creator = `@neoxr.js – Wildan Izzudin`
+   #timeout = 15000
 
-   async short(url: string): Promise<any> {
+   short = async (url: string): Promise<any> => {
       try {
          const form = new URLSearchParams()
          form.append('url', url)
          const json = await (await axios.post('https://s.neoxr.eu/api/short', form, {
-            timeout: this.timeout
+            timeout: this.#timeout
          })).data
          return json
       } catch (e) {
@@ -23,7 +23,7 @@ class Uploader {
       }
    }
 
-   async fallbackShort(url: string): Promise<any> {
+   fallbackShort = async (url: string): Promise<any> => {
       try {
          const form = new URLSearchParams()
          form.append('url', url)
@@ -31,14 +31,14 @@ class Uploader {
          return json
       } catch (e: any) {
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: e.message
          }
       }
    }
 
-   async upload(i: Buffer | string, filename?: string, extension?: string): Promise<any> {
+   upload = async (i: Buffer | string, filename?: string, extension?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -53,7 +53,7 @@ class Uploader {
          form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
          const json = await retry(async () => {
             const response = await (await axios.post('https://s.neoxr.eu/api/upload', form, {
-               timeout: this.timeout,
+               timeout: this.#timeout,
                headers: {
                   ...form.getHeaders()
                }
@@ -74,7 +74,7 @@ class Uploader {
       }
    }
 
-   async fallbackUpload(i: Buffer | string, filename?: string, extension?: string): Promise<any> {
+   fallbackUpload = async (i: Buffer | string, filename?: string, extension?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -89,7 +89,7 @@ class Uploader {
          form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
          const json = await retry(async () => {
             const response = await (await axios.post('https://neoxr-uploader.hf.space/api/upload', form, {
-               timeout: this.timeout,
+               timeout: this.#timeout,
                headers: {
                   ...form.getHeaders()
                }
@@ -109,7 +109,7 @@ class Uploader {
       }
    }
 
-   async tmpfiles(i: Buffer | string, filename?: string, extension?: string, time: number = 60): Promise<any> {
+   tmpfiles = async (i: Buffer | string, filename?: string, extension?: string, time: number = 60): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -131,7 +131,7 @@ class Uploader {
          form.append('max_time', time)
          form.append('upload', 'Upload')
          const html = await (await axios.post('https://tmpfiles.org', form, {
-            timeout: this.timeout,
+            timeout: this.#timeout,
             headers: {
                cookie,
                ...form.getHeaders()
@@ -140,12 +140,12 @@ class Uploader {
          const $ = cheerio.load(html)
          const fileUrl = $('a.download').attr('href')
          if (!fileUrl) return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: 'Failed to Upload!'
          }
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: true,
             data: {
                filename: $('h2.file-title').text()?.trim(),
@@ -155,14 +155,14 @@ class Uploader {
          }
       } catch (e: any) {
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: e.message
          }
       }
    }
 
-   async imgbb(i: Buffer | string, filename?: string): Promise<any> {
+   imgbb = async (i: Buffer | string, filename?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const parse = await axios.get('https://imgbb.com', {
@@ -189,7 +189,7 @@ class Uploader {
          form.append('auth_token', token)
          const json = await retry(async () => {
             const response = await (await axios.post('https://imgbb.com/json', form, {
-               timeout: this.timeout,
+               timeout: this.#timeout,
                headers: {
                   "Accept": "*/*",
                   "User-Agent": "Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36",
@@ -211,7 +211,7 @@ class Uploader {
          })
          if (json.status_code != 200) throw new Error('Failed to Upload!')
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: true,
             original: json,
             data: {
@@ -220,18 +220,18 @@ class Uploader {
          }
       } catch (e: any) {
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: e.message
          }
       }
    }
 
-   async imgkub(i: Buffer | string, filename?: string): Promise<any> {
+   imgkub = async (i: Buffer | string, filename?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const parse = await axios.get('https://imgkub.com', {
-            timeout: this.timeout,
+            timeout: this.#timeout,
             headers: {
                "User-Agent": "Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36"
             }
@@ -276,7 +276,7 @@ class Uploader {
          })
          if (json.status_code != 200) throw new Error('Failed to Upload!')
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: true,
             original: json,
             data: {
@@ -285,14 +285,14 @@ class Uploader {
          }
       } catch (e: any) {
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: e.message
          }
       }
    }
 
-   async uguu(i: Buffer | string, filename?: string, extension?: string): Promise<any> {
+   uguu = async (i: Buffer | string, filename?: string, extension?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -307,7 +307,7 @@ class Uploader {
          form.append('files[]', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
          const json = await retry(async () => {
             const response = await (await axios.post('https://uguu.se/upload.php', form, {
-               timeout: this.timeout,
+               timeout: this.#timeout,
                headers: {
                   origin: 'https://uguu.se',
                   referer: 'https://uguu.se/',
@@ -326,21 +326,21 @@ class Uploader {
          })
          if (!json?.success) throw new Error('Failed to Upload!')
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: true,
             data: json.files[0]
          }
       } catch (e: any) {
          console.error(e)
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: e.message
          }
       }
    }
 
-   async catbox(i: Buffer | string, filename?: string, extension?: string): Promise<any> {
+   catbox = async (i: Buffer | string, filename?: string, extension?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -357,7 +357,7 @@ class Uploader {
          form.append('fileToUpload', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
          const json = await retry(async () => {
             const response = await (await axios.post('https://catbox.moe/user/api.php', form, {
-               timeout: this.timeout,
+               timeout: this.#timeout,
                headers: {
                   origin: 'https://catbox.moe',
                   referer: 'https://catbox.moe/',
@@ -376,7 +376,7 @@ class Uploader {
          })
          if (!json || (json && !/files/.test(json))) throw new Error('Failed to Upload!')
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: true,
             data: {
                url: json
@@ -385,18 +385,18 @@ class Uploader {
       } catch (e: any) {
          console.error(e)
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: e.message
          }
       }
    }
 
-   async studiointermedia(i: Buffer | string, filename?: string): Promise<any> {
+   studiointermedia = async (i: Buffer | string, filename?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const parse = await axios.get('https://www.studiointermedia.com/upload', {
-            timeout: this.timeout,
+            timeout: this.#timeout,
             headers: {
                "User-Agent": "Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36"
             }
@@ -443,7 +443,7 @@ class Uploader {
          })
          if (json.status_code != 200) throw new Error('Failed to Upload!')
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: true,
             original: json,
             data: {
@@ -452,14 +452,14 @@ class Uploader {
          }
       } catch (e: any) {
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: e.message
          }
       }
    }
 
-   async imghost(i: Buffer | string, filename?: string): Promise<any> {
+   imghost = async (i: Buffer | string, filename?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const parse = await axios.get('https://imghost.online/en', {
@@ -492,7 +492,7 @@ class Uploader {
          form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + ext)
          const json = await retry(async () => {
             const response = await (await axios.post('https://imghost.online/upload', form, {
-               timeout: this.timeout,
+               timeout: this.#timeout,
                headers: {
                   "Accept": "*/*",
                   "User-Agent": "Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36",
@@ -517,7 +517,7 @@ class Uploader {
 
          if (!json.direct_link) throw new Error('Failed to Upload!')
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: true,
             original: json,
             data: {
@@ -526,14 +526,14 @@ class Uploader {
          }
       } catch (e: any) {
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: e.message
          }
       }
    }
 
-   async quax(i: Buffer | string, filename?: string, extension?: string): Promise<any> {
+   quax = async (i: Buffer | string, filename?: string, extension?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -548,7 +548,7 @@ class Uploader {
          form.append('files[]', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
          form.append('expiry', '-1')
          const json = await (await axios.post('https://qu.ax/upload', form, {
-            timeout: this.timeout,
+            timeout: this.#timeout,
             headers: {
                origin: 'https://qu.ax',
                referer: 'https://qu.ax/',
@@ -558,21 +558,21 @@ class Uploader {
          })).data
          if (!json.success) throw new Error('Failed to Upload!')
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: true,
             data: json?.files?.[0]
          }
       } catch (e: any) {
          console.error(e)
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: e?.response?.data?.message || e.message
          }
       }
    }
 
-   async crypty(i: Buffer | string, filename?: string, extension?: string): Promise<any> {
+   crypty = async (i: Buffer | string, filename?: string, extension?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -587,7 +587,7 @@ class Uploader {
          form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
 
          const json = await (await axios.post('https://cdn.crypty.workers.dev', form, {
-            timeout: this.timeout,
+            timeout: this.#timeout,
             headers: form.getHeaders()
          })).data
 
@@ -596,14 +596,14 @@ class Uploader {
       } catch (e: any) {
          console.error(e)
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: e.message
          }
       }
    }
 
-   async tempimage(i: Buffer | string, filename?: string): Promise<any> {
+   tempimage = async (i: Buffer | string, filename?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const parse = await axios.get('https://www.temp-image.com', {
@@ -636,7 +636,7 @@ class Uploader {
          form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + ext)
          const json = await retry(async () => {
             const response = await (await axios.post('https://www.temp-image.com/upload', form, {
-               timeout: this.timeout,
+               timeout: this.#timeout,
                headers: {
                   "Accept": "*/*",
                   "User-Agent": "Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36",
@@ -661,7 +661,7 @@ class Uploader {
 
          if (!json.direct_link) throw new Error('Failed to Upload!')
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: true,
             original: json,
             data: {
@@ -670,14 +670,14 @@ class Uploader {
          }
       } catch (e: any) {
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: e.message
          }
       }
    }
 
-   async x0(i: Buffer | string, filename?: string, extension?: string): Promise<any> {
+   x0 = async (i: Buffer | string, filename?: string, extension?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
          const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
@@ -695,20 +695,20 @@ class Uploader {
          form.append('keep_name', 'true')
 
          const html = await (await axios.post('https://x0.at', form, {
-            timeout: this.timeout,
+            timeout: this.#timeout,
             headers: form.getHeaders()
          })).data
 
          const $ = cheerio.load(html)
          const fileUrl = $('a').attr('href')
          if (!fileUrl) return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: 'Failed to Upload!'
          }
 
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: true,
             data: {
                url: fileUrl
@@ -717,7 +717,7 @@ class Uploader {
       } catch (e: any) {
          console.error(e)
          return {
-            creator: this.creator,
+            creator: this.#creator,
             status: false,
             msg: e.message
          }

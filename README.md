@@ -191,3 +191,20 @@ import { tempimage } from '@neoxr/helper'
 tempimage(input: Buffer | String).then(console.log)
 ```
 **Site :** [https://www.temp-image.com/](https://www.temp-image.com/)
+
+### 12. X0
+
+```js
+import { x0 } from '@neoxr/helper'
+
+/**
+ * Uploads a file from a Buffer or a remote file URL.
+ * @param input Buffer (binary file) or string (URL)
+ * @param filename String (filename) - optional
+ * @param extension String (extension) - optional
+ * @returns Promise<Response>
+ * Information : support all extension
+ */
+x0(input: Buffer | String, filename?: String, extension?: String).then(console.log)
+```
+**Site :** [https://x0.at](https://x0.at)
