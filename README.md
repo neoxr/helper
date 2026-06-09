@@ -128,22 +128,7 @@ studiointermedia(input: Buffer | String).then(console.log)
 ```
 **Site :** [https://www.studiointermedia.com/](https://www.studiointermedia.com/)
 
-### 8. ImgHost
-
-```js
-import { imghost } from '@neoxr/helper'
-
-/**
- * Uploads a file from a Buffer or a remote image URL.
- * @param input Buffer (binary file) or string (URL)
- * @returns Promise<Response>
- * Information : image only
- */
-imghost(input: Buffer | String).then(console.log)
-```
-**Site :** [https://imghost.online/](https://imghost.online/)
-
-### 9. Quax
+### 8. Quax
 
 ```js
 import { quax } from '@neoxr/helper'
@@ -160,7 +145,7 @@ quax(input: Buffer | String, filename?: String, extension?: String).then(console
 ```
 **Site :** [https://qu.ax](https://qu.ax)
 
-### 10. Crypty CDN
+### 9. Crypty CDN
 
 ```js
 import { crypty } from '@neoxr/helper'
@@ -177,7 +162,7 @@ crypty(input: Buffer | String, filename?: String, extension?: String).then(conso
 ```
 **Site :** [https://cdn.crypty.workers.dev](https://cdn.crypty.workers.dev)
 
-### 11. Temp Image
+### 10. Temp Image
 
 ```js
 import { tempimage } from '@neoxr/helper'
@@ -192,7 +177,7 @@ tempimage(input: Buffer | String).then(console.log)
 ```
 **Site :** [https://www.temp-image.com/](https://www.temp-image.com/)
 
-### 12. X0
+### 11. X0
 
 ```js
 import { x0 } from '@neoxr/helper'

@@ -4,7 +4,7 @@ import { fromBuffer as getExtension } from 'file-type'
 import util from './utils'
 import * as cheerio from 'cheerio'
 import retry from 'async-retry'
-import { v4 as uuidv4 } from 'uuid'
+import { randomUUID } from 'node:crypto'
 
 class Uploader {
    #creator = `@neoxr.js – Wildan Izzudin`
@@ -459,80 +459,6 @@ class Uploader {
       }
    }
 
-   imghost = async (i: Buffer | string, filename?: string): Promise<any> => {
-      try {
-         if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
-         const parse = await axios.get('https://imghost.online/en', {
-            headers: {
-               "User-Agent": "Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36"
-            }
-         })
-         const token = cheerio.load(parse.data)('meta[name="csrf-token"]')?.attr('content')
-         const cookie = parse?.headers?.['set-cookie']?.join(';')
-         if (!token || !cookie) throw new Error('Can\'t get credentials')
-         const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
-            responseType: 'arraybuffer'
-         })).data : null
-         let ext = 'jpg'
-         const parsed = await getExtension(file)
-         if (parsed) {
-            ext = parsed?.ext || 'jpg'
-         }
-         const form = new FormData()
-         form.append('dzuuid', uuidv4())
-         form.append('dzchunkindex', '0')
-         form.append('dztotalfilesize', file.length)
-         form.append('dzchunksize', file.length)
-         form.append('dztotalchunkcount', '1')
-         form.append('dzchunkbyteoffset', '0')
-         form.append('size', file.length)
-         form.append('type', parsed?.mime)
-         form.append('password', '')
-         form.append('upload_auto_delete', '0')
-         form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + ext)
-         const json = await retry(async () => {
-            const response = await (await axios.post('https://imghost.online/upload', form, {
-               timeout: this.#timeout,
-               headers: {
-                  "Accept": "*/*",
-                  "User-Agent": "Mozilla/5.0 (Linux; Android 6.0.1; SM-J500G) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Mobile Safari/537.36",
-                  "Origin": "https://imghost.online",
-                  "Referer": "https://imghost.online/",
-                  "Referrer-Policy": "strict-origin-when-cross-origin",
-                  cookie,
-                  "X-CSRF-TOKEN": token,
-                  "X-Requested-With": "XMLHttpRequest",
-                  ...form.getHeaders()
-               }
-            })).data
-            if (!response.direct_link) throw new Error('Failed to Upload!')
-            return response
-         }, {
-            retries: 5,
-            factor: 2,
-            minTimeout: 1000,
-            maxTimeout: 1500,
-            onRetry: () => { }
-         })
-
-         if (!json.direct_link) throw new Error('Failed to Upload!')
-         return {
-            creator: this.#creator,
-            status: true,
-            original: json,
-            data: {
-               url: json.direct_link
-            }
-         }
-      } catch (e: any) {
-         return {
-            creator: this.#creator,
-            status: false,
-            msg: e.message
-         }
-      }
-   }
-
    quax = async (i: Buffer | string, filename?: string, extension?: string): Promise<any> => {
       try {
          if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
@@ -623,7 +549,7 @@ class Uploader {
             ext = parsed?.ext || 'jpg'
          }
          const form = new FormData()
-         form.append('dzuuid', uuidv4())
+         form.append('dzuuid', randomUUID())
          form.append('dzchunkindex', '0')
          form.append('dztotalfilesize', file.length)
          form.append('dzchunksize', file.length)

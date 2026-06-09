@@ -1,6 +1,6 @@
 {
    "name": "@neoxr/helper",
-   "version": "2.3.10",
+   "version": "2.3.11",
    "description": "Just helper tools",
    "main": "lib/index.js",
    "types": "lib/index.d.ts",
@@ -24,8 +24,7 @@
       "axios": "~1.6.8",
       "cheerio": "^1.0.0-rc.12",
       "file-type": "~16.5.2",
-      "form-data": "~4.0.0",
-      "uuid": "^11.1.0"
+      "form-data": "~4.0.0"
    },
    "devDependencies": {
       "@types/node": "^22.13.10",
