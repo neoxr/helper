@@ -69,7 +69,7 @@ export const upload = async (i: Buffer | string, filename?: string, extension?: 
       return json
    } catch (e: any) {
       console.error(`Upload primary failed (${e.message})`)
-      return fallbackUpload(i, filename, extension)
+      return crypty(i, filename, extension)
    }
 }
 
@@ -511,7 +511,7 @@ export const crypty = async (i: Buffer | string, filename?: string, extension?: 
       const form = new FormData()
       form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
 
-      const json = await (await axios.post('https://cdn.crypty.workers.dev', form, {
+      const json = await (await axios.post('https://cryptybyte.pages.dev', form, {
          timeout: TIMEOUT,
          headers: form.getHeaders()
       })).data
@@ -639,6 +639,37 @@ export const x0 = async (i: Buffer | string, filename?: string, extension?: stri
             url: fileUrl
          }
       }
+   } catch (e: any) {
+      console.error(e)
+      return {
+         creator: CREATOR,
+         status: false,
+         msg: e.message
+      }
+   }
+}
+
+export const zlyvo = async (i: Buffer | string, filename?: string, extension?: string): Promise<any> => {
+   try {
+      if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
+      const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
+         responseType: 'arraybuffer'
+      })).data : null
+      let ext = 'txt'
+      const parsed = await getExtension(file)
+      if (parsed) {
+         ext = parsed?.ext || 'txt'
+      }
+      const form = new FormData()
+      form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
+
+      const json = await (await axios.post('https://zlyvo.pages.dev', form, {
+         timeout: TIMEOUT,
+         headers: form.getHeaders()
+      })).data
+
+      if (!json.status) throw new Error('Failed to Upload!')
+      return json
    } catch (e: any) {
       console.error(e)
       return {

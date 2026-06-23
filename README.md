@@ -160,7 +160,7 @@ import { crypty } from '@neoxr/helper'
  */
 crypty(input: Buffer | String, filename?: String, extension?: String).then(console.log)
 ```
-**Site :** [https://cdn.crypty.workers.dev](https://cdn.crypty.workers.dev)
+**Site :** [https://cryptybyte.pages.dev](https://cryptybyte.pages.dev)
 
 ### 10. Temp Image
 
