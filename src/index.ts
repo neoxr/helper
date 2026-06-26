@@ -7,26 +7,41 @@ import retry from 'async-retry'
 import { randomUUID } from 'node:crypto'
 
 const CREATOR = `@neoxr.js – Wildan Izzudin`
-const TIMEOUT = 15000
+const TIMEOUT = 30000
+
+// export const short = async (url: string): Promise<any> => {
+//    try {
+//       const form = new URLSearchParams()
+//       form.append('url', url)
+//       const json = await (await axios.post('https://s.neoxr.eu/api/short', form, {
+//          timeout: TIMEOUT
+//       })).data
+//       return json
+//    } catch (e) {
+//       return fallbackShort(url)
+//    }
+// }
 
 export const short = async (url: string): Promise<any> => {
    try {
       const form = new URLSearchParams()
       form.append('url', url)
-      const json = await (await axios.post('https://s.neoxr.eu/api/short', form, {
+      const json = await (await axios.post('https://zlyvo.pages.dev/api/short', form, {
          timeout: TIMEOUT
       })).data
       return json
-   } catch (e) {
+   } catch (e: any) {
       return fallbackShort(url)
    }
 }
 
-const fallbackShort = async (url: string): Promise<any> => {
+export const fallbackShort = async (url: string): Promise<any> => {
    try {
       const form = new URLSearchParams()
       form.append('url', url)
-      const json = await (await axios.post('https://neoxr-uploader.hf.space/api/short', form)).data
+      const json = await (await axios.post('https://cryvo.pages.dev/api/short', form, {
+         timeout: TIMEOUT
+      })).data
       return json
    } catch (e: any) {
       return {
@@ -36,6 +51,42 @@ const fallbackShort = async (url: string): Promise<any> => {
       }
    }
 }
+
+// export const upload = async (i: Buffer | string, filename?: string, extension?: string): Promise<any> => {
+//    try {
+//       if (!Buffer.isBuffer(i) && !util.isUrl(i)) throw new Error('Only buffer and url formats are allowed')
+//       const file = Buffer.isBuffer(i) ? i : util.isUrl(i) ? await (await axios.get(i, {
+//          responseType: 'arraybuffer'
+//       })).data : null
+//       let ext = 'txt'
+//       const parsed = await getExtension(file)
+//       if (parsed) {
+//          ext = parsed?.ext || 'txt'
+//       }
+//       const form = new FormData()
+//       form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
+//       const json = await retry(async () => {
+//          const response = await (await axios.post('https://s.neoxr.eu/api/upload', form, {
+//             timeout: TIMEOUT,
+//             headers: {
+//                ...form.getHeaders()
+//             }
+//          })).data
+//          if (!response.status) throw new Error('Failed to Upload!')
+//          return response
+//       }, {
+//          retries: 3,
+//          factor: 2,
+//          minTimeout: 1000,
+//          maxTimeout: 1500,
+//          onRetry: () => { }
+//       })
+//       return json
+//    } catch (e: any) {
+//       console.error(`Upload primary failed (${e.message})`)
+//       return crypty(i, filename, extension)
+//    }
+// }
 
 export const upload = async (i: Buffer | string, filename?: string, extension?: string): Promise<any> => {
    try {
@@ -50,26 +101,17 @@ export const upload = async (i: Buffer | string, filename?: string, extension?: 
       }
       const form = new FormData()
       form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
-      const json = await retry(async () => {
-         const response = await (await axios.post('https://s.neoxr.eu/api/upload', form, {
-            timeout: TIMEOUT,
-            headers: {
-               ...form.getHeaders()
-            }
-         })).data
-         if (!response.status) throw new Error('Failed to Upload!')
-         return response
-      }, {
-         retries: 3,
-         factor: 2,
-         minTimeout: 1000,
-         maxTimeout: 1500,
-         onRetry: () => { }
-      })
+
+      const json = await (await axios.post('https://zlyvo.pages.dev/api/upload', form, {
+         timeout: TIMEOUT,
+         headers: form.getHeaders()
+      })).data
+
+      if (!json.status) throw new Error('Failed to Upload!')
       return json
    } catch (e: any) {
       console.error(`Upload primary failed (${e.message})`)
-      return crypty(i, filename, extension)
+      return fallbackUpload(i, filename, extension)
    }
 }
 
@@ -86,22 +128,13 @@ const fallbackUpload = async (i: Buffer | string, filename?: string, extension?:
       }
       const form = new FormData()
       form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
-      const json = await retry(async () => {
-         const response = await (await axios.post('https://neoxr-uploader.hf.space/api/upload', form, {
-            timeout: TIMEOUT,
-            headers: {
-               ...form.getHeaders()
-            }
-         })).data
-         if (!response.status) throw new Error('Failed to Upload!')
-         return response
-      }, {
-         retries: 2,
-         factor: 2,
-         minTimeout: 1000,
-         maxTimeout: 1500,
-         onRetry: () => { }
-      })
+
+      const json = await (await axios.post('https://cryvo.pages.dev/api/upload', form, {
+         timeout: TIMEOUT,
+         headers: form.getHeaders()
+      })).data
+
+      if (!json.status) throw new Error('Failed to Upload!')
       return json
    } catch (e) {
       return tmpfiles(i, filename, extension)
@@ -511,7 +544,7 @@ export const crypty = async (i: Buffer | string, filename?: string, extension?: 
       const form = new FormData()
       form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
 
-      const json = await (await axios.post('https://cryptybyte.pages.dev', form, {
+      const json = await (await axios.post('https://cryvo.pages.dev/api/upload', form, {
          timeout: TIMEOUT,
          headers: form.getHeaders()
       })).data
@@ -663,7 +696,7 @@ export const zlyvo = async (i: Buffer | string, filename?: string, extension?: s
       const form = new FormData()
       form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
 
-      const json = await (await axios.post('https://zlyvo.pages.dev', form, {
+      const json = await (await axios.post('https://zlyvo.pages.dev/api/upload', form, {
          timeout: TIMEOUT,
          headers: form.getHeaders()
       })).data
