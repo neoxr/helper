@@ -26,7 +26,7 @@ export const short = async (url: string): Promise<any> => {
    try {
       const form = new URLSearchParams()
       form.append('url', url)
-      const json = await (await axios.post('https://zlyvo.pages.dev/api/short', form, {
+      const json = await (await axios.post('https://secure-signed.pages.dev/api/short', form, {
          timeout: TIMEOUT
       })).data
       return json
@@ -102,7 +102,7 @@ export const upload = async (i: Buffer | string, filename?: string, extension?: 
       const form = new FormData()
       form.append('file', Buffer.from(file), (filename || util.makeId(10)) + '.' + (extension || ext))
 
-      const json = await (await axios.post('https://zlyvo.pages.dev/api/upload', form, {
+      const json = await (await axios.post('https://secure-signed.pages.dev/api/upload', form, {
          timeout: TIMEOUT,
          headers: form.getHeaders()
       })).data
